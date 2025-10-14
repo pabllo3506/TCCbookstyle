@@ -1,0 +1,239 @@
+/* ========================================================= */
+/* 1. VARIÁVEIS DE COR (NOVA PALETA - TEMA CINZA SOFISTICADO) */
+/* ========================================================= */
+:root {
+    /* Cores de Fundo (Claras e Modernas) */
+    --cor-fundo-principal: #ffffff;  /* Cinza muito claro, quase branco */
+    --cor-fundo-secundaria: #FFFFFF; /* Branco puro para containers e cards */
+
+    /* Cores de Destaque (Azul Moderno) */
+    --cor-primaria: #45725d;         /* Cinza super escuro (para textos e títulos) */
+    --cor-secundaria: #45725d;       /* AZUL VIBRANTE (Nova Cor de Destaque / CTA) */
+    --cor-secundaria-hover: #0252a1; /* Azul mais escuro para Hover */
+
+    /* Variáveis Funcionais (ATUALIZADAS) */
+    --cor-texto: var(--cor-primaria);
+    --cor-titulo: var(--cor-primaria);
+    --cor-destaque: var(--cor-secundaria);
+    --cor-linha: #45725d;            /* Cinza claro para bordas e linhas */
+    --cor-texto-claro: #72978b;      /* Branco para texto dentro de botões */
+}
+
+/* ========================================================= */
+/* 2. ESTILOS GLOBAIS E RESET */
+/* ========================================================= */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Roboto', sans-serif; /* Fontes mais modernas */
+    display: flex; 
+    flex-direction: column;
+    align-items: center; 
+    /* justify-content: center; */ /* Removido para o header ficar no topo */
+    min-height: 100vh;
+    margin: 0; 
+    background-color: var(--cor-fundo-principal); 
+    color: var(--cor-texto); 
+}
+
+a {
+    color: var(--cor-destaque);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: var(--cor-secundaria-hover);
+}
+
+h2 {
+    color: var(--cor-titulo); 
+    border-bottom: 2px solid var(--cor-linha); 
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+    text-align: center;
+    font-family: 'Georgia', serif; /* Mantendo uma fonte serifada elegante */
+    font-size: 28px;
+    letter-spacing: 1px;
+}
+
+/* ========================================================= */
+/* 3. HEADER & NAVEGAÇÃO */
+/* ========================================================= */
+header {
+    width: 100%;
+    background-color: var(--cor-fundo-secundaria); 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--cor-linha); /* Linha mais sutil */
+    position: fixed; 
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra suave */
+}
+
+/* IMPORTANTE: Para manter a cor do seu título/logo original */
+.logo-title {
+    font-size: 24px;
+    margin: 0 0 0 10px;
+    color: #212529; /* << COR ALTERADA PARA PRETO/CINZA ESCURO */
+    font-family: 'Times New Roman', serif;
+}
+
+nav a {
+    color: var(--cor-texto);
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+nav a:hover {
+    color: var(--cor-destaque); /* Destaque azul no hover */
+}
+
+/* Estilo do CONTAINER de conteúdo principal */
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 120px auto 40px; /* Aumenta a margem do topo para não ficar atrás do header */
+    background-color: var(--cor-fundo-secundaria); 
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Sombra mais suave */
+}
+
+/* ========================================================= */
+/* 4. CARROSSEL (NOVA SEÇÃO) */
+/* ========================================================= */
+.carousel-container {
+    width: 100%;
+    max-width: 600px; /* Ajuste conforme necessário */
+    margin: 30px auto; /* Centraliza e adiciona espaço */
+    position: relative;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(119, 55, 55, 0.1);
+    background-color: var(--cor-fundo-secundaria);
+}
+
+.carousel-viewport {
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.carousel-slide {
+    flex: 0 0 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    text-align: center;
+}
+
+.carousel-slide img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+}
+
+.carousel-slide .description {
+    margin-top: 15px;
+    font-size: 1.1em;
+    color: #6c757d; /* Cinza médio para descrição */
+}
+
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--cor-linha);
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 22px;
+    color: var(--cor-texto);
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.carousel-button:hover {
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.prev-button { left: 15px; }
+.next-button { right: 15px; }
+
+
+/* ========================================================= */
+/* 5. BOTÕES PRINCIPAIS (ABAIXO DO CARROSSEL) */
+/* ========================================================= */
+.buttons-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px; /* Espaço entre os botões */
+    margin-top: 20px;
+}
+
+.main-button {
+    background-color: var(--cor-destaque);
+    color: var(--cor-texto-claro);
+    padding: 12px 28px;
+    border: none;
+    border-radius: 50px; /* Bordas arredondadas para um look moderno */
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 4px 10px rgba(52, 108, 167, 0.3); /* Sombra da cor do botão */
+}
+
+.main-button:hover {
+    background-color: var(--cor-secundaria-hover);
+    transform: translateY(-2px); /* Efeito de elevação */
+}
+
+.btn-primary {
+    background-color: var(--cor-destaque);
+    color: antiquewhite;
+    padding: 15px 40px; /* ATUALIZADO com o seu estilo */
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 4px 12px rgba(69, 114, 93, 0.4);
+    width: auto; /* ATUALIZADO com o seu estilo */
+    display: inline-block; /* Garante comportamento correto */
+    text-align: center;
+}
+
+.btn-primary:hover {
+    color: var(--cor-fundo-principal);
+    transform: translateY(-2px);
+}
+
+.secondary-button:hover {
+    background-color: var(--cor-destaque);
+    color: var(--cor-texto-claro);
+    transform: translateY(-2px);
+}
