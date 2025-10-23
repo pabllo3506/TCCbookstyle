@@ -1,221 +1,194 @@
 <?php
-include '../includes/config.php';
-$categoria_atual = 'kids'; 
+// O include já inicia a sessão
+include '../conexao.php';
+
+// Define a categoria e o título para esta página específica
+$categoria_atual = 'Kids'; 
 $titulo_pagina = 'Espaço Kids';
-$servicos = $conn->query("SELECT id, nome, preco, duracao FROM servicos WHERE categoria = '$categoria_atual' ORDER BY preco");
+
+// Verifica se o usuário está logado
+$logado = isset($_SESSION['usuario_id']);
+
+// Prepara e executa a consulta ao banco de dados de forma segura
+$stmt = $conn->prepare("SELECT id, nome, preco, duracao FROM servicos WHERE categoria = ? ORDER BY nome ASC");
+$stmt->bind_param("s", $categoria_atual);
+$stmt->execute();
+$servicos = $stmt->get_result();
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title><?php echo $titulo_pagina; ?> | Bookstyle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo htmlspecialchars($titulo_pagina); ?> | Bookstyle</title>
+    <link rel="stylesheet" href="../style.css">
     
     <style>
-        /* Variáveis de Cores Globais */
-        :root {
-            --fundo-principal: #000000;
-            --fundo-secundario: #111111;
-            --cor-destaque: #8A2BE2; /* Roxo principal */
-            --cor-titulo: #DDA0DD; /* Roxo claro */
-            --cor-linha: #8A2BE2;
-            --cor-texto-claro: #FFFFFF;
-            --cor-texto-suave: #CCCCCC;
-        }
-
-        /* Base */
-        body {
-            font-family: 'Montserrat', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--fundo-principal); 
-            color: var(--cor-texto-claro);
-            min-height: 100vh;
-        }
-
-        a {
-            color: var(--cor-destaque);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        a:hover {
-            color: var(--cor-titulo);
-        }
-
-        /* HEADER */
-        header {
+        .carousel-section {
             width: 100%;
-            background-color: var(--fundo-principal);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 40px;
+            max-width: 1100px;
+            margin: 100px auto 20px;
+            padding: 0 30px;
             box-sizing: border-box;
-            border-bottom: 2px solid var(--cor-linha);
-            position: fixed; 
-            top: 0;
-            z-index: 100;
         }
-
-        header h1 {
-            font-size: 24px;
-            margin: 0;
-            color: var(--cor-destaque);
+        .carousel-container { position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); }
+        .carousel-track { display: flex; transition: transform 0.5s ease-in-out; }
+        .carousel-slide { flex: 0 0 100%; box-sizing: border-box; }
+        .carousel-slide img { width: 100%; height: auto; display: block; aspect-ratio: 16 / 7; object-fit: cover; }
+        .carousel-button {
+            position: absolute; top: 50%; transform: translateY(-50%); background-color: rgba(255, 255, 255, 0.7);
+            border: none; border-radius: 50%; width: 40px; height: 40px; color: var(--cor-primaria);
+            font-size: 20px; font-weight: bold; cursor: pointer; z-index: 10;
+            display: flex; justify-content: center; align-items: center; transition: background-color 0.3s, transform 0.2s;
         }
-
-        nav a {
-            color: var(--cor-texto-claro);
-            text-decoration: none;
-            margin-left: 20px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        /* Container Principal */
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 100px auto 40px; 
-            background-color: var(--fundo-secundario);
-            padding: 30px 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-        }
-
-        h2 {
-            color: var(--cor-titulo);
-            border-bottom: 2px solid var(--cor-linha);
-            padding-bottom: 10px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        /* Services Grid (Layout dos Cartões) */
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            padding: 20px 0;
-        }
-
-        /* Card Individual do Serviço */
-        .service-card {
-            background-color: var(--fundo-principal);
-            padding: 25px;
-            border-radius: 8px;
-            border: 1px solid var(--fundo-secundario);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: transform 0.3s, border-color 0.3s;
-        }
-
-        .service-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--cor-destaque);
-        }
-
-        .service-card h3 {
-            color: var(--cor-texto-claro);
-            font-size: 1.4em;
-            margin-top: 0;
-            border-bottom: 1px solid var(--fundo-secundario);
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-        }
-
-        .details {
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .service-price {
-            color: var(--cor-destaque);
-            font-size: 1.6em;
-            font-weight: bold;
-        }
-
-        /* Botão Agendar no Card */
-        .btn-card-agendar {
-            background-color: var(--cor-destaque);
-            color: var(--cor-texto-claro);
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: bold;
-            text-align: center;
-            transition: background-color 0.3s;
-        }
-
-        .btn-card-agendar:hover {
-            background-color: var(--cor-titulo);
-        }
-
-        /* Botão principal no rodapé da página */
-        .btn-primary {
-            background-color: var(--cor-destaque);
-            color: var(--cor-texto-claro);
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 17px;
-            font-weight: bold;
-            text-decoration: none;
-            transition: background-color 0.3s;
-            display: inline-block;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--cor-titulo);
-        }
+        .carousel-button:hover { background-color: white; transform: translateY(-50%) scale(1.1); }
+        .prev-button { left: 15px; }
+        .next-button { right: 15px; }
+        .carousel-nav { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        .carousel-dot { width: 10px; height: 10px; border-radius: 50%; background-color: rgba(255, 255, 255, 0.6); border: 1px solid rgba(0, 0, 0, 0.2); cursor: pointer; transition: background-color 0.3s, transform 0.2s; }
+        .carousel-dot.active { background-color: white; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="logo">
-            <h1 style="color: var(--cor-destaque);">BS</h1> 
+            <a href="../index.php">
+                <img src="/bookstyle_salao/pages/img/bslogotipo.png" alt="" style="width: 70px; height:70px;">
+            </a>
         </div>
         <nav class="nav-links">
+            <a href="../index.php" title="Início" class="home-icon-nav">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16"><path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L8.707 1.5Z"/></svg>
+            </a>
             <a href="feminino.php">Feminino</a>
             <a href="masculino.php">Masculino</a>
             <a href="kids.php">Kids</a>
-            <a href="../index.php">Home</a>
+
+            <?php if ($logado): ?>
+                <a href="meus_agendamentos.php">Meus Agendamentos</a>
+                <span class="welcome-message">Olá, <?php echo htmlspecialchars($_SESSION['usuario_nome']); ?>!</span>
+                <a href="../logout.php" class="nav-link-sair">Sair</a>
+            <?php else: ?>
+                <a href="../login.php">Login</a>
+            <?php endif; ?>
         </nav>
     </header>
 
-    <div class="container">
-        <h2>Cortes Divertidos e Ambiente Agradável</h2>
-        
-        <div class="services-grid">
-            <?php while ($servico = $servicos->fetch_assoc()): ?>
-            <div class="service-card">
-                <div>
-                    <h3><?php echo $servico['nome']; ?></h3>
-                    <p style="color: var(--cor-texto-suave);">Duração: **<?php echo $servico['duracao']; ?> minutos**. Detalhes sobre o serviço aqui.</p>
+    <div class="carousel-section">
+        <div class="carousel-container">
+            <div class="carousel-track">
+                <div class="carousel-slide">
+                    <img src="/bookstyle_salao/pages/img/imagemcrianca.png" alt="Imagem de corte de cabelo infantil">
                 </div>
-                <div class="details">
-                    <div>
-                        <span class="service-price">R$ <?php echo number_format($servico['preco'], 2, ',', '.'); ?></span>
-                    </div>
-                    <a href="agendar.php?servico_id=<?php echo $servico['id']; ?>" class="btn-card-agendar">
-                        Agendar
-                    </a>
+                <div class="carousel-slide">
+                    <img src="/bookstyle_salao/pages/img/imgcorteinfantil.png" alt="Imagem de penteado infantil para festas">
+                </div>
+                <div class="carousel-slide">
+                    <img src="/bookstyle_salao/pages/img/espaco.png" alt="Imagem do ambiente infantil do salão">
                 </div>
             </div>
-            <?php endwhile; ?>
-        </div>
-
-        <div style="text-align: center; margin-top: 50px;">
-            <a href="agendar.php" class="btn-primary" style="width: auto; padding: 15px 30px; background-color: var(--cor-titulo);">Ver todas as opções de agendamento</a>
+            <button class="carousel-button prev-button">&#10094;</button>
+            <button class="carousel-button next-button">&#10095;</button>
+            <div class="carousel-nav"></div>
         </div>
     </div>
 
+    <main class="container services-page" style="margin-top: 0;">
+        <h2 class="title-decorated"><?php echo htmlspecialchars($titulo_pagina); ?></h2>
+        
+        <div class="services-grid">
+            
+            <?php if ($servicos->num_rows > 0): ?>
+                <?php while ($servico = $servicos->fetch_assoc()): ?>
+                
+                <div class="service-card">
+                    <div class="info-servico">
+                        <h3><?php echo htmlspecialchars($servico['nome']); ?></h3>
+                        <p class="service-details">Duração: <strong><?php echo htmlspecialchars($servico['duracao']); ?> minutos</strong></p>
+                    </div>
+                    <div class="details-footer">
+                        <span class="service-price">R$ <?php echo number_format($servico['preco'], 2, ',', '.'); ?></span>
+                        <a href="agendar.php?servico_id=<?php echo $servico['id']; ?>" class="btn-card-agendar">
+                            Agendar
+                        </a>
+                    </div>
+                </div>
+
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p style="text-align: center; grid-column: 1 / -1;">Nenhum serviço encontrado para a categoria Kids.</p>
+            <?php endif; ?>
+
+        </div>
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const track = document.querySelector('.carousel-track');
+            const slides = Array.from(track.children);
+            const nextButton = document.querySelector('.next-button');
+            const prevButton = document.querySelector('.prev-button');
+            const nav = document.querySelector('.carousel-nav');
+
+            if (!track || slides.length === 0) return;
+
+            const slideWidth = slides[0].getBoundingClientRect().width;
+
+            slides.forEach((slide, index) => {
+                const dot = document.createElement('button');
+                dot.classList.add('carousel-dot');
+                if (index === 0) dot.classList.add('active');
+                nav.appendChild(dot);
+                slide.style.left = slideWidth * index + 'px';
+            });
+
+            const dots = Array.from(nav.children);
+            let currentIndex = 0;
+
+            const updateDots = (currentDot, targetDot) => {
+                currentDot.classList.remove('active');
+                targetDot.classList.add('active');
+            };
+
+            const moveToSlide = (targetIndex) => {
+                const currentDot = dots[currentIndex];
+                const targetDot = dots[targetIndex];
+                const targetSlide = slides[targetIndex];
+                track.style.transform = `translateX(-${targetSlide.style.left})`;
+                updateDots(currentDot, targetDot);
+                currentIndex = targetIndex;
+            };
+
+            const nextSlide = () => {
+                const nextIndex = (currentIndex + 1) % slides.length;
+                moveToSlide(nextIndex);
+            };
+
+            const prevSlide = () => {
+                const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
+                moveToSlide(prevIndex);
+            };
+
+            nextButton.addEventListener('click', nextSlide);
+            prevButton.addEventListener('click', prevSlide);
+
+            nav.addEventListener('click', e => {
+                const targetDot = e.target.closest('button');
+                if (!targetDot) return;
+                const targetIndex = dots.findIndex(dot => dot === targetDot);
+                moveToSlide(targetIndex);
+            });
+            
+            setInterval(nextSlide, 5000); // Auto-play
+        });
+       
+    </script>
+
 </body>
 </html>
+<?php
+// Fecha o statement e a conexão com o banco para liberar recursos
+$stmt->close();
+$conn->close();
+?>

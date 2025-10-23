@@ -9,7 +9,7 @@ date_default_timezone_set('America/Sao_Paulo');
 define('DB_SERVER', 'localhost');
 define('DB_USERNAME', 'root'); // Verifique se é 'root'
 define('DB_PASSWORD', '');     // Verifique se está vazia
-define('DB_NAME', 'bookstyle_salao');
+define('DB_NAME', 'espaco_beleza_tcc');
 
 // --- Tentativa de Conexão com o MySQL ---
 $conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
